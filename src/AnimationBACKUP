@@ -1,0 +1,148 @@
+
+//function initializeMixer
+function initializeMixer(model) {
+    UTILITY.mixer = new THREE.AnimationMixer(CHARACTER_HANDLER.model);
+}
+
+// *************************
+// * Set up blending based on clusters  *
+// *************************
+
+function setupClusterBlending() {
+    // Ensure idleAction and stanceAction are available
+    if (!idleAction || !stanceAction || !waitingAction) return;
+
+    // Update the mixer to handle blending
+    mixer.addEventListener('update', (event) => {
+        const delta = SCENE_HANDLER.clock.getDelta();
+
+        // Update the actions
+        updateClusterWeights(idleAction, delta, clusters.bodyCluster);
+        updateClusterWeights(stanceAction, delta, clusters.headCluster);
+        updateClusterWeights(waitingAction, delta, clusters.headCluster);
+    });
+}
+
+// Function to update weights for a specific action based on cluster
+function updateClusterWeights(action, delta, cluster) {
+    if (!action || !cluster || cluster.length === 0) return;
+
+    cluster.forEach(bone => {
+        const trackName = `${bone.name}.position`;
+        const track = action.getMixer()._bindings.find(binding => binding.binding.targetNode.name === bone.name);
+
+        if (track) {
+            track.weight = 1.0;  // or another logic for blending
+        }
+    });
+
+    mixer.update(delta);
+}
+
+function getCurrentAnim() {
+    // return the currently playing Animation Actions 
+    // Check which clusters will be affected by the new target anim
+    // for the affected clusters, transition from currentAnim(affectClusters) to targetAnim(affectedClusters)
+}
+
+function getTargetAnim() {
+    //return a random target anim from the list 
+}
+
+
+
+export function getAnimationByName(animations, name) {
+    return animations.find(animation => animation.name === name);
+}
+
+//Diese oder getTarget Anim??? 
+function getRandomAnimation() {
+    const randomIndex = Math.floor(Math.random() * animationConfig.length);
+    return animationConfig[randomIndex];
+}
+
+
+
+function executeGlobalCrossFade(currentAnim, targetAnim, duration, startTime) {
+    setWeight(currentAnim, 0); 
+    setWeight(targetAnim, 1);  
+    startTime = 0;
+
+    if (currentAnim && targetAnim) {
+        currentAnim.crossFadeTo(targetAnim, duration, true);
+    } else {
+        console.warn('One or both actions are not defined.');
+    }
+}
+
+function executeClusterCrossFade(currentAnim, targetAnim, duration, startTime, blendMode) {
+    console.log('Current Animation:', currentAnim);
+    console.log('Target Animation:', targetAnim);
+
+    if (!currentAnim || !targetAnim) {
+        console.error('Current or target animation is not defined.');
+        return;
+    }
+
+    //const cluster = blendMode === 'headCluster' ? clusters.headCluster : clusters.bodyCluster;
+
+    // Get tracks from the current animation clip
+    const currentClip = currentAnim.getClip();
+    const tracks = currentClip.tracks;
+
+    // Ensure tracks are available
+    if (!tracks || tracks.length === 0) {
+        console.error('No tracks found in the current animation clip:', currentClip);
+        return;
+    }
+
+    // Update weights based on cluster
+    cluster.forEach(bone => {
+        const trackName = `${bone.name}.position`;
+   
+        // Find the track that matches the bone name
+        const track = tracks.find(track => track.name === trackName);
+
+        if (track) {
+            // Here you can modify track properties as needed
+        } else {
+            console.warn('Track not found for bone:', bone);
+        }
+    });
+
+    if (currentAnim instanceof THREE.AnimationAction) {
+        console.log('currentAnim is a valid AnimationAction.');
+    } else {
+        console.error('currentAnim is not an AnimationAction:', currentAnim);
+        console.log('Constructor name of currentAnim:', currentAnim.constructor.name);
+    }
+
+
+    // Perform crossfade
+    if (currentAnim && targetAnim) {
+        currentAnim.crossFadeTo(targetAnim, duration, true);
+    } else {
+        console.warn('One or both actions are not defined.');
+    }
+}
+
+
+function transitionToAnim(currentAnim, targetAnim, duration, blendMode, timestamp) {
+    const randomAnimConfig = getRandomAnimation(actions);
+    blendMode = randomAnimConfig.applyTo;
+    console.log('duration is: ' + duration);
+
+    unPauseAllActions();
+
+    // Determine when to start the transition
+    const startTime = timestamp || SCENE_HANDLER.clock.getElapsedTime(); 
+    console.log('Blend Mode set to: ' + blendMode);
+    // Execute crossfade based on blend mode
+    if (blendMode === 'global') {
+        executeGlobalCrossFade(currentAnim, targetAnim, duration, 0);
+    } else if (blendMode === 'headCluster' || blendMode === 'bodyCluster') {
+        executeClusterCrossFade(currentAnim, targetAnim, duration, 0, blendMode);
+    } else {
+        console.warn('Unknown blend mode:', blendMode);
+    }
+}

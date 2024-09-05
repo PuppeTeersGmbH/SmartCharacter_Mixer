@@ -16,7 +16,8 @@
         {
             "imports": {
                 "three": "../node_modules/three/build/three.module.js",
-                "three/addons/": "../node_modules/three/examples/jsm/"
+                "three/addons/": "../node_modules/three/examples/jsm/",
+                "motion": "../node_modules/motion/lib/animate.js"
             }
         }
     </script>
@@ -25,6 +26,9 @@
     <!-- Add the container element here -->
     <div id="container"></div>
 
-    <script type="module" src="./index.js"></script>
-</body>
+    <script type="module" src="./utils.js"></script>
+    <script type="module" src="./animation-handler.js"></script>
+    <script type="module" src="./scene-handler.js"></script>
+    <script type="module" src="./character-handler.js"></script>
+    <script type="module" src="./bone-clusters.js"></script>
 </html>
