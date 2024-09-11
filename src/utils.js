@@ -8,6 +8,9 @@ let _skeletonHelper;
 let _mixer = null; 
 let _animationClips = []; 
 let animationActions = [];
+let _currentAnim = null; 
+let _targetAnim = null; 
+
 
 export const ANIMATION_TABLE = new Map();
 let _characterInfluences = [];
@@ -82,4 +85,20 @@ export function getCharacterInfluences() {
 }
 export function setCharacterInfluences(characterInfluences) {
     _characterInfluences = characterInfluences; 
+}
+
+export function getCurrentAnim() {
+    return _currentAnim; 
+}
+
+export function setCurrentAnim(currentAnim) {
+    _currentAnim = currentAnim; 
+}
+
+export function getTargetAnim() {
+    return _targetAnim; 
+}
+
+export function setTargetAnim(targettAnim) {
+    _targetAnim = targettAnim; 
 }

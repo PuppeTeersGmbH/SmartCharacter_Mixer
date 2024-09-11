@@ -11,7 +11,7 @@ export function drawScene() {
     // Set up the scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xa0a0a0);
-    scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
+    //scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
 
     // Set up the camera
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);

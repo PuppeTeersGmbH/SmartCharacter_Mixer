@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as SCENE_HANDLER from './scene-handler.js';
 import * as UTILITY from './utils.js';
-import { clusterBones } from './bone-clusters.js';
 import { initializeActions } from './animation-handler.js';
 import { AnimationClip } from 'three';
 
@@ -50,7 +49,6 @@ export function loadModel() {
             });
 
             extractAnimationData(gltf);
-            clusterBones();
             UTILITY.createMixer(model);
             initializeActions(); 
 
@@ -77,11 +75,9 @@ function extractAnimationData(gltf) {
     }
 
     for (const clip of animations) {
-        const cluster = getClusterFromName(clip.name);
-
         // Assuming AnimationClip is correctly imported or available globally
         if (clip.constructor.name === 'AnimationClip' || clip instanceof AnimationClip) {
-            UTILITY.ANIMATION_TABLE.set(clip, cluster);
+            UTILITY.ANIMATION_TABLE.set(clip);
         } else {
             console.error(`Clip is not an instance of AnimationClip: ${clip}`);
         }
@@ -92,16 +88,6 @@ function extractAnimationData(gltf) {
 }
 
 
-const getClusterFromName = (name) => {
-    // Check each keyword and return the associated cluster if found in the name
-    for (const [key, value] of Object.entries(UTILITY.CLUSTER_KEYWORDS)) {
-        if (name.includes(value)) {
-            return value;
-        }
-    }
-    // Return 'undefined' if no keyword is found
-    return 'UNKNOWN';
-};
 
 // *************************
 // * DEBUGGING *
